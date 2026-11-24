@@ -24,6 +24,7 @@ install -m 0644 "$project_dir/public/index.html" "$project_dir/public/style.css"
   "$project_dir/public/app.js" "$project_dir/public/vazirmatn.woff2" \
   "$stage_dir/usr/share/$package_name/public/"
 install -m 0644 "$project_dir/public/OFL-Vazirmatn.txt" "$stage_dir/usr/share/doc/$package_name/"
+install -m 0644 "$project_dir/LICENSE" "$stage_dir/usr/share/doc/$package_name/copyright"
 install -m 0644 "$project_dir/README.md" "$stage_dir/usr/share/doc/$package_name/README.md"
 install -m 0644 "$project_dir/packaging/$package_name.desktop" "$stage_dir/usr/share/applications/"
 install -m 0644 "$project_dir/packaging/$package_name.svg" "$stage_dir/usr/share/icons/hicolor/scalable/apps/"
