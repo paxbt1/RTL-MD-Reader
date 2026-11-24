@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Persian Markdown Reader
+Name[fa]=خوانشگر مارک‌داون فارسی
+Comment=Write and preview Persian Markdown
+Comment[fa]=نوشتن و خواندن مارک‌داون فارسی با پیش‌نمایش زنده
+Exec=persian-md-reader
+Icon=persian-md-reader
+Terminal=false
+Categories=Utility;TextEditor;
+Keywords=Markdown;Persian;Farsi;Reader;

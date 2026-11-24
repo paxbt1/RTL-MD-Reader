@@ -1,0 +1,52 @@
+#!/usr/bin/python3
+"""Start the local reader service and open it in the default browser."""
+
+import subprocess
+import sys
+import time
+from urllib.error import URLError
+from urllib.request import urlopen
+
+
+URL = "http://127.0.0.1:8765/"
+HEALTH = URL + "health"
+
+
+def ready():
+    try:
+        with urlopen(HEALTH, timeout=0.5) as response:
+            return response.status == 200 and response.read() == b"persian-md-reader\n"
+    except (OSError, URLError):
+        return False
+
+
+def main():
+    if not ready():
+        subprocess.run(
+            ["systemctl", "--user", "daemon-reload"],
+            capture_output=True, check=False,
+        )
+        result = subprocess.run(
+            ["systemctl", "--user", "start", "persian-md-reader.service"],
+            capture_output=True, text=True, check=False,
+        )
+        if result.returncode:
+            print(result.stderr.strip() or "Could not start Persian Markdown Reader.", file=sys.stderr)
+            return 1
+        for _ in range(40):
+            if ready():
+                break
+            time.sleep(0.1)
+    if not ready():
+        print("Persian Markdown Reader did not respond on 127.0.0.1:8765.", file=sys.stderr)
+        return 1
+    subprocess.Popen(
+        ["xdg-open", URL],
+        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

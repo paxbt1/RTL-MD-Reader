@@ -1,0 +1,11 @@
+[Unit]
+Description=Persian Markdown Reader (local web application)
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/share/persian-md-reader/app.py --host 127.0.0.1 --port 8765
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

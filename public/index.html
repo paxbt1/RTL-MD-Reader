@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>خوانشگر مارک‌داون فارسی</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">مـ</span><div><strong>خوانشگر مارک‌داون</strong><small>نوشتن، دیدن، خواندن</small></div></div>
+    <div class="header-actions">
+      <span id="save-status" aria-live="polite">آماده</span>
+      <button id="import-btn" class="ghost" title="باز کردن فایل Markdown">باز کردن فایل</button>
+      <button id="pdf-btn" class="ghost" title="چاپ یا ذخیرهٔ پیش‌نمایش به صورت PDF">دریافت PDF</button>
+      <button id="export-btn" class="primary" title="دانلود متن Markdown">دریافت فایل <span aria-hidden="true">↧</span></button>
+      <input id="file-input" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="pane editor-pane" aria-label="ویرایشگر مارک‌داون">
+      <div class="pane-head"><div><span class="eyebrow">۰۱ / ورودی</span><h2>متن مارک‌داون</h2></div><span class="pane-note">ویرایش در سمت چپ</span></div>
+      <div class="toolbar" role="toolbar" aria-label="قالب‌بندی متن">
+        <button data-action="bold" title="پررنگ (Ctrl+B)"><b>B</b></button>
+        <button data-action="italic" title="مورب (Ctrl+I)"><i>I</i></button>
+        <button data-action="heading" title="عنوان">H</button>
+        <button data-action="link" title="پیوند">↗</button>
+        <span class="divider"></span>
+        <button data-action="align-right" title="راست‌چین کردن پاراگراف" aria-label="راست‌چین">☷<span class="tiny-arrow">↱</span></button>
+        <button data-action="align-left" title="چپ‌چین کردن پاراگراف" aria-label="چپ‌چین">☷<span class="tiny-arrow">↰</span></button>
+        <button data-action="size-small" title="اندازهٔ کوچک">A<small>−</small></button>
+        <button data-action="size-large" title="اندازهٔ بزرگ">A<small>+</small></button>
+        <button data-action="table" title="درج جدول">▦</button>
+      </div>
+      <textarea id="source" dir="rtl" spellcheck="false" aria-label="متن مارک‌داون" placeholder="اینجا بنویسید…"></textarea>
+      <div class="pane-foot"><span id="word-count">۰ واژه</span><span>ذخیرهٔ خودکار در همین مرورگر</span></div>
+    </section>
+
+    <section class="pane preview-pane" aria-label="پیش‌نمایش متن">
+      <div class="pane-head"><div><span class="eyebrow">۰۲ / نمایش</span><h2>پیش‌نمایش زنده</h2></div><div class="preview-actions"><button id="toggle-editor" class="focus-btn" type="button" aria-pressed="false" title="جمع کردن بخش متن مارک‌داون">جمع کردن ویرایشگر</button><div class="zoom"><button id="zoom-out" aria-label="کوچک کردن نمایش">−</button><output id="zoom-value">۱۰۰٪</output><button id="zoom-in" aria-label="بزرگ کردن نمایش">+</button></div></div></div>
+      <div class="preview-scroll"><article id="preview" class="markdown-body" dir="rtl" aria-live="polite"></article></div>
+      <div class="pane-foot"><span>راست‌چین و سازگار با متن فارسی و انگلیسی</span><span class="live-dot">نمایش زنده</span></div>
+    </section>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>
