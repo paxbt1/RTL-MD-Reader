@@ -61,15 +61,33 @@ def set_border(paragraph, side, color, size=8):
     borders.append(border)
 
 
+def set_complex_bold(run):
+    run.bold = True
+    properties = run._r.get_or_add_rPr()
+    if properties.find(qn("w:bCs")) is None:
+        properties.append(OxmlElement("w:bCs"))
+
+
 def font_for(run, size, color=BODY, bold=False, italic=False, code=False):
     run.font.name = "DejaVu Sans Mono" if code else FONT
     run.font.size = Pt(size)
     run.font.color.rgb = color
     run.bold = bold
     run.italic = italic
-    fonts = run._r.get_or_add_rPr().rFonts
+    properties = run._r.get_or_add_rPr()
+    fonts = properties.rFonts
     fonts.set(qn("w:cs"), run.font.name)
     fonts.set(qn("w:eastAsia"), run.font.name)
+    complex_size = properties.find(qn("w:szCs"))
+    if complex_size is None:
+        complex_size = OxmlElement("w:szCs")
+        properties.append(complex_size)
+    complex_size.set(qn("w:val"), str(round(size * 2)))
+    if bold:
+        set_complex_bold(run)
+    if italic:
+        complex_italic = OxmlElement("w:iCs")
+        properties.append(complex_italic)
     return run
 
 
@@ -79,8 +97,9 @@ def add_inline(paragraph, element, size, options=None):
     def text(value, opts):
         if not value:
             return
+        display_value = f"\u2066{value}\u2069" if opts.get("code") else value
         run = font_for(
-            paragraph.add_run(value), size * (0.83 if opts.get("code") else 1),
+            paragraph.add_run(display_value), size * (0.83 if opts.get("code") else 1),
             LINK if opts.get("link") else RGBColor(155, 75, 61) if opts.get("code") else BODY,
             opts.get("bold", False), opts.get("italic", False), opts.get("code", False),
         )
@@ -139,7 +158,7 @@ def add_paragraph(container, element, context, base_size, tag="p", prefix=""):
     add_inline(paragraph, element, size)
     if tag.startswith("h"):
         for run in paragraph.runs:
-            run.bold = True
+            set_complex_bold(run)
             run.font.color.rgb = GREEN
     return paragraph
 
@@ -184,7 +203,7 @@ def add_table(document, element, context, base_size, content_width):
     if context.rtl:
         visual = OxmlElement("w:bidiVisual")
         table._tbl.tblPr.append(visual)
-    weights = [1] * column_count
+    weights = [10] * column_count
     for row in rows:
         for index, cell in enumerate(row.xpath("./th | ./td")):
             weights[index] = max(weights[index], min(len(" ".join(cell.itertext())), 60))
@@ -214,7 +233,7 @@ def add_table(document, element, context, base_size, content_width):
             add_inline(paragraph, source_cell, base_size * context.scale * .92)
             if is_header:
                 for run in paragraph.runs:
-                    run.bold = True
+                    set_complex_bold(run)
                     run.font.color.rgb = GREEN
     document.add_paragraph().paragraph_format.space_after = Pt(3)
 
