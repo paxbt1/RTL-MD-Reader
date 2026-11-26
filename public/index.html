@@ -12,6 +12,11 @@
     <div class="header-actions">
       <span id="save-status" aria-live="polite">آماده</span>
       <button id="import-btn" class="ghost" title="باز کردن فایل Markdown">باز کردن فایل</button>
+      <button id="docx-btn" class="ghost" title="دانلود فایل Word قابل ویرایش">دریافت Word</button>
+      <select id="pdf-layout" aria-label="عرض خروجی PDF" title="اندازهٔ صفحهٔ PDF">
+        <option value="a4">PDF استاندارد A4</option>
+        <option value="preview">PDF هم‌عرض نمایش</option>
+      </select>
       <button id="pdf-btn" class="ghost" title="چاپ یا ذخیرهٔ پیش‌نمایش به صورت PDF">دریافت PDF</button>
       <button id="export-btn" class="primary" title="دانلود متن Markdown">دریافت فایل <span aria-hidden="true">↧</span></button>
       <input id="file-input" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>

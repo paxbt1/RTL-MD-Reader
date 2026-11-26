@@ -129,24 +129,35 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def do_POST(self):
-        if self.path != "/render":
+        if self.path not in {"/render", "/export/docx"}:
             self.send_error(404)
             return
         length = int(self.headers.get("Content-Length", "0"))
-        if length > 2_000_000:
+        if length < 0 or length > 2_000_000:
             self.send_error(413)
             return
         try:
-            source = json.loads(self.rfile.read(length))["source"]
+            payload = json.loads(self.rfile.read(length))
+            source = payload["source"]
             if not isinstance(source, str):
                 raise ValueError("source must be a string")
-            body = json.dumps({"html": render(source)}, ensure_ascii=False).encode()
-        except (ValueError, KeyError, json.JSONDecodeError):
+            markup = render(source)
+            if self.path == "/render":
+                body = json.dumps({"html": markup}, ensure_ascii=False).encode()
+                content_type = "application/json; charset=utf-8"
+            else:
+                from docx_export import export_docx
+
+                body = export_docx(markup, payload.get("zoom", 100), payload.get("width", 700))
+                content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        except (ValueError, KeyError, TypeError, OverflowError):
             self.send_error(400)
             return
         self.send_response(200)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
+        if self.path == "/export/docx":
+            self.send_header("Content-Disposition", 'attachment; filename="document.docx"')
         self.end_headers()
         self.wfile.write(body)
 

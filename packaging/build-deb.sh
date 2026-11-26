@@ -14,20 +14,26 @@ mkdir -p "$stage_dir/DEBIAN" \
   "$stage_dir/usr/share/$package_name/public" \
   "$stage_dir/usr/share/applications" \
   "$stage_dir/usr/share/icons/hicolor/scalable/apps" \
+  "$stage_dir/usr/share/fonts/truetype/$package_name" \
   "$stage_dir/usr/lib/systemd/user" \
+  "$stage_dir/usr/share/doc/$package_name/docs" \
   "$stage_dir/usr/share/doc/$package_name" \
   "$project_dir/dist"
 
 install -m 0755 "$project_dir/packaging/$package_name" "$stage_dir/usr/bin/$package_name"
 install -m 0644 "$project_dir/app.py" "$stage_dir/usr/share/$package_name/app.py"
+install -m 0644 "$project_dir/docx_export.py" "$stage_dir/usr/share/$package_name/docx_export.py"
 install -m 0644 "$project_dir/public/index.html" "$project_dir/public/style.css" \
   "$project_dir/public/app.js" "$project_dir/public/vazirmatn.woff2" \
   "$stage_dir/usr/share/$package_name/public/"
 install -m 0644 "$project_dir/public/OFL-Vazirmatn.txt" "$stage_dir/usr/share/doc/$package_name/"
 install -m 0644 "$project_dir/LICENSE" "$stage_dir/usr/share/doc/$package_name/copyright"
 install -m 0644 "$project_dir/README.md" "$stage_dir/usr/share/doc/$package_name/README.md"
+install -m 0644 "$project_dir/docs/screenshot.png" "$stage_dir/usr/share/doc/$package_name/docs/"
 install -m 0644 "$project_dir/packaging/$package_name.desktop" "$stage_dir/usr/share/applications/"
 install -m 0644 "$project_dir/packaging/$package_name.svg" "$stage_dir/usr/share/icons/hicolor/scalable/apps/"
+install -m 0644 "$project_dir/fonts/Vazirmatn-Regular.ttf" "$project_dir/fonts/Vazirmatn-Bold.ttf" \
+  "$stage_dir/usr/share/fonts/truetype/$package_name/"
 install -m 0644 "$project_dir/packaging/$package_name.service" "$stage_dir/usr/lib/systemd/user/"
 
 cat > "$stage_dir/DEBIAN/control" <<EOF
@@ -37,10 +43,10 @@ Section: editors
 Priority: optional
 Architecture: all
 Maintainer: Persian Markdown Reader contributors <noreply@users.noreply.github.com>
-Depends: python3, python3-markdown (>= 3.3.6), xdg-utils, systemd
+Depends: python3, python3-markdown (>= 3.3.6), python3-docx (>= 0.8.11), xdg-utils, systemd, fontconfig
 Description: Lightweight Persian Markdown editor and reader
  A local browser-based Markdown editor with live RTL preview, Vazirmatn font,
- tables, paragraph alignment, and PDF printing.
+ tables, paragraph alignment, editable Word export, and PDF printing.
 EOF
 
 output="$project_dir/dist/${package_name}_${version}_all.deb"

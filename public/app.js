@@ -5,6 +5,7 @@ const count = document.querySelector('#word-count');
 const zoomValue = document.querySelector('#zoom-value');
 const workspace = document.querySelector('.workspace');
 const toggleEditor = document.querySelector('#toggle-editor');
+const pdfLayout = document.querySelector('#pdf-layout');
 const storageKey = 'persian-markdown-reader:v1';
 const sample = `# به خوانشگر مارک‌داون خوش آمدید
 
@@ -37,6 +38,8 @@ let sequence = 0;
 let zoom = Number(localStorage.getItem(storageKey + ':zoom')) || 100;
 setZoom(zoom);
 setEditorCollapsed(localStorage.getItem(storageKey + ':collapsed') === 'true');
+pdfLayout.value = localStorage.getItem(storageKey + ':pdf-layout') || 'a4';
+pdfLayout.onchange = () => localStorage.setItem(storageKey + ':pdf-layout', pdfLayout.value);
 
 function faNumber(n) { return new Intl.NumberFormat('fa-IR').format(n); }
 function updateCount() {
@@ -141,8 +144,41 @@ document.querySelector('#pdf-btn').onclick = async () => {
   clearTimeout(timer);
   await render();
   await document.fonts.ready;
+  document.querySelector('#dynamic-print-layout')?.remove();
+  if (pdfLayout.value === 'preview') {
+    const contentWidth = Math.ceil(preview.getBoundingClientRect().width);
+    const style = document.createElement('style');
+    style.id = 'dynamic-print-layout';
+    style.textContent = `@page { size: ${contentWidth + 48}px 1122px; margin: 24px; } @media print { .markdown-body, .workspace.editor-collapsed .markdown-body { width: ${contentWidth}px !important; max-width: none !important; } }`;
+    document.head.append(style);
+  }
   status.textContent = 'در پنجرهٔ چاپ، «ذخیره به‌صورت PDF» را انتخاب کنید';
   window.print();
+};
+window.addEventListener('afterprint', () => document.querySelector('#dynamic-print-layout')?.remove());
+document.querySelector('#docx-btn').onclick = async () => {
+  status.textContent = 'در حال ساخت فایل Word…';
+  try {
+    const response = await fetch('/export/docx', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        source: editor.value,
+        zoom,
+        width: Math.ceil(preview.getBoundingClientRect().width)
+      })
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const url = URL.createObjectURL(await response.blob());
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'document.docx';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    status.textContent = 'فایل Word آماده شد';
+  } catch (error) {
+    status.textContent = 'خطا در ساخت فایل Word';
+    console.error(error);
+  }
 };
 const fileInput = document.querySelector('#file-input');
 document.querySelector('#import-btn').onclick = () => fileInput.click();
